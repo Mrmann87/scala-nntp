@@ -71,12 +71,12 @@ class NNTP(val host: String,
   }
 
   def help(): HelpResponse = {
-    write(NNTPCommand("HELP")) match {
+    write("HELP") match {
       case response@StatusResponse(code, text) => {
         println("Got response: " + response)
         code match {
           case 100 => NNTPResponseFactory.text(incoming) match {
-            case response@TextResponse(text) => HelpResponse(text.mkString("\n"))
+            case response@TextResponse(`text`) => HelpResponse(text.mkString("\n"))
           }
           case _ => throw new NNTPCommandException(code, text)
         }
@@ -85,7 +85,7 @@ class NNTP(val host: String,
   }
 
   def group(name: String): GroupSelectedResponse = {
-    write(NNTPCommand("GROUP", name)) match {
+    write("GROUP", name) match {
       case response@StatusResponse(code, text) => {
         println("Got response: " + response)
         code match {
@@ -105,14 +105,14 @@ class NNTP(val host: String,
   }
 
   def login(): NNTPResponse = {
-    write(NNTPCommand("AUTHINFO", "USER", username)) match {
+    write("AUTHINFO", "USER", username) match {
       case response@StatusResponse(code, text) => {
         println("Got response: " + response)
         code match {
           case 381 => {
             // 381 Password required
-            write(NNTPCommand("AUTHINFO", "PASS", password)) match {
-              case response@StatusResponse(code, text) => {
+            write("AUTHINFO", "PASS", password) match {
+              case response@StatusResponse(`code`, `text`) => {
                 println("Got response: " + response)
                 code match {
                   case 281 => response // 281 Authentication Accepted
@@ -128,28 +128,11 @@ class NNTP(val host: String,
     }
   }
 
-  private def write(command: NNTPCommand): NNTPResponse = {
-    write(command.toString())
-  }
-
-  private def write(command: String): NNTPResponse = {
+  private def write(commandArgs: Any*): NNTPResponse = {
+    val command = commandArgs.mkString(" ") + "\r\n"
     println("Writing command: " + command)
     outgoing.print(command)
     outgoing.flush()
     NNTPResponseFactory.status(incoming)
   }
-
-  object NNTPCommand {
-    def apply(command: String, params: Any*) = new NNTPCommand(command, params: _*)
-  }
-
-  class NNTPCommand(private val command: String, params: Any*) {
-    override def toString() = {
-      command + (
-        if (!params.isEmpty) " " + params.mkString(" ")
-        else ""
-        ) + "\r\n"
-    }
-  }
-
 }
