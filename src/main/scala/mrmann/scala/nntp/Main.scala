@@ -13,8 +13,8 @@ object Main {
   def main(args: Array[String]) {
     val nntp: NNTP = NNTP(
       host = "news.astraweb.com",
-      username = "Mrmann87",
-      password = "toby1234"
+      username = "",
+      password = ""
     )
     println(nntp.help().get())
     val group = nntp.group("comp.lang.ruby").get()
