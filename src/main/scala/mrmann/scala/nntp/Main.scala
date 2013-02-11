@@ -1,5 +1,9 @@
 package mrmann.scala.nntp
 
+//import scala.actors.Futures._
+import com.twitter.util.{Promise, Future}
+import response.GroupSelected
+
 /**
  * User: mrmann
  * Date: 2/9/13
@@ -12,8 +16,14 @@ object Main {
       username = "Mrmann87",
       password = "toby1234"
     )
-    println(nntp.help())
-    println(nntp.group("comp.lang.ruby"))
-    nntp.close()
+    println(nntp.help().get())
+    val group = nntp.group("comp.lang.ruby").get()
+    println(group)
+    group match {
+      case GroupSelected(_, first, _, _) => {
+        println(nntp.article(first).get())
+      }
+    }
+    println(nntp.close().get())
   }
 }

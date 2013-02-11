@@ -7,9 +7,19 @@ package mrmann.scala.nntp.response
  */
 abstract class CommandResponse()
 
-case class HelpResponse(text: String)
+case class Article(text: String) extends CommandResponse()
 
-case class GroupSelectedResponse(numArticles: Long,
+case class Body(text: String) extends CommandResponse()
+
+case class Head(text: String) extends CommandResponse()
+
+case class ClosingConnection(text: String) extends CommandResponse()
+
+case class Ok(text: String) extends CommandResponse()
+
+case class Help(text: String) extends CommandResponse()
+
+case class GroupSelected(numArticles: Long,
                          firstArticle: Long,
                          lastArticle: Long,
                          groupName: String) extends CommandResponse

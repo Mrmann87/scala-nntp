@@ -23,7 +23,7 @@ object NNTPResponseFactory {
 
   private def collect(incoming: BufferedReader, lines: List[String]): List[String] = {
     val line = incoming.readLine().trim
-    if (line.charAt(0) != '.')
+    if (line.length == 0 || line.charAt(0) != '.')
       collect(incoming, line :: lines)
     else if (line.length > 1 && line.charAt(1) == '.')
       collect(incoming, line.substring(1) :: lines)
